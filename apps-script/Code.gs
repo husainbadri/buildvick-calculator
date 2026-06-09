@@ -11,13 +11,13 @@
  *   Current deployment: https://script.google.com/macros/s/AKfycbyiNdtWrpNvnz_sKig7bpWej456qCjokXCRmEsJiBd3cSK-TlZrKDB20Cm8H6g31oGj/exec
  *
  * Sheet columns (row 1 = header):
- *   A: Timestamp | B: Name | C: Email | D: Phone | E: Source | F: Notes | G: Status
+ *   A: Timestamp | B: Name | C: Email | D: Phone | E: Source | F: Notes | G: Status | H: City
  */
 
 const CONFIG = {
   SHEET_NAME: 'Leads',
   LOCK_TIMEOUT: 30000,
-  HEADERS: ['Timestamp', 'Name', 'Email', 'Phone', 'Source', 'Notes', 'Status'],
+  HEADERS: ['Timestamp', 'Name', 'Email', 'Phone', 'Source', 'Notes', 'Status', 'City'],
   SUPABASE_URL: 'https://gyqneffgffrflqjbhbqu.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5cW5lZmZnZmZyZmxxamJoYnF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5NTU3MTMsImV4cCI6MjA5MjUzMTcxM30.CY-KYiiWhGwH7Bmg5oiarERW86YzdKAWlIaGDXZ5SkY'
 };
@@ -46,7 +46,8 @@ function doGet() {
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) return json_({ status: 'success', leads: [] });
 
-    const range = sheet.getRange(2, 1, lastRow - 1, CONFIG.HEADERS.length);
+    const lastCol = Math.max(sheet.getLastColumn(), CONFIG.HEADERS.length);
+    const range = sheet.getRange(2, 1, lastRow - 1, lastCol);
     const values = range.getValues();
     const leads = values.map((r, i) => ({
       row: i + 2,
@@ -56,7 +57,8 @@ function doGet() {
       phone: r[3],
       source: r[4],
       notes: r[5] || '',
-      status: r[6] || 'New'
+      status: r[6] || 'New',
+      city: r[7] || ''
     }));
     return json_({ status: 'success', leads });
   } catch (err) {
@@ -74,7 +76,7 @@ function doPost(e) {
     const action = payload.action || 'add';
 
     if (action === 'add') {
-      const { name, email, phone, source, notes } = payload;
+      const { name, email, phone, source, notes, city } = payload;
       if (!name || !email) {
         return json_({ status: 'error', message: 'name and email required' });
       }
@@ -85,9 +87,10 @@ function doPost(e) {
         phone || 'N/A',
         source || 'Landing Page',
         notes || '',
-        'New'
+        'New',
+        city || ''
       ]);
-      syncToSupabase_({ name, email, phone, source, notes });
+      syncToSupabase_({ name, email, phone, source, notes, city });
       return json_({ status: 'success', message: 'Lead captured.' });
     }
 
@@ -130,6 +133,7 @@ function syncToSupabase_(lead) {
       source: lead.source || 'Landing Page',
       notes: lead.notes || '',
       status: lead.status || 'New',
+      city: lead.city || '',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
