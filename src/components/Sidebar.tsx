@@ -6,7 +6,7 @@ import logo from "@/assets/logo.png";
 
 const mainNavItems = [
   { label: "Dashboard", icon: LayoutGrid01, href: "#/dashboard" },
-  { label: "Contacts", icon: Users01, href: "#/leads" },
+  { label: "Meta Leads", icon: Users01, href: "#/leads" },
   { label: "Templates", icon: File01, href: "#/campaigns" },
   { label: "Campaigns", icon: Announcement01, href: "#/audience" },
   { label: "Analytics", icon: BarChart01, href: "#/analytics" },
