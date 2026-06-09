@@ -140,8 +140,12 @@ export function setScriptUrl(url: string) {
   localStorage.setItem(STORAGE_KEY, url.trim());
 }
 
+const VALID_STATUSES = ["New", "Contacted", "Hot", "Won", "Lost"];
+
 function toLead(row: Record<string, unknown>): Lead {
   const leadNotes = parseLeadNotes(String(row.notes ?? ""));
+  const rawStatus = String(row.status ?? "New");
+  const isCity = !VALID_STATUSES.includes(rawStatus);
   return {
     id: String(row.id ?? ""),
     name: String(row.name ?? ""),
@@ -149,12 +153,12 @@ function toLead(row: Record<string, unknown>): Lead {
     phone: String(row.phone ?? "N/A"),
     source: String(row.source ?? "Landing Page"),
     notes: leadNotes.feedback,
-    city: String(row.city ?? ""),
+    city: String(row.city ?? (isCity ? rawStatus : "")),
     location: leadNotes.location,
     sales_person: leadNotes.sales_person,
     remark_1: leadNotes.remark_1,
     remark_2: leadNotes.remark_2,
-    status: (row.status ?? "New") as Lead["status"],
+    status: (isCity ? "New" : rawStatus) as Lead["status"],
     follow_up: (row.follow_up as string) || null,
     follow_up_2: (row.follow_up_2 as string) || null,
     created_at: row.created_at as string,
