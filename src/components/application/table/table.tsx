@@ -105,11 +105,11 @@ interface TableRootProps extends AriaTableProps, Omit<ComponentPropsWithRef<"tab
     size?: "sm" | "md";
 }
 
-const TableRoot = ({ className, size = "md", ...props }: TableRootProps) => {
+const TableRoot = ({ className, size, ...props }: TableRootProps) => {
     const context = useContext(TableContext);
 
     return (
-        <TableContext.Provider value={{ size: context?.size ?? size }}>
+        <TableContext.Provider value={{ size: size ?? context?.size ?? "md" }}>
             <div className="overflow-x-auto">
                 <AriaTable className={(state) => cx("w-full overflow-x-hidden", typeof className === "function" ? className(state) : className)} {...props} />
             </div>

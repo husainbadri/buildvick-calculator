@@ -10,6 +10,7 @@ import AnalyticsPage from "./pages/AnalyticsPage";
 import { fetchLeads, getScriptUrl, type Lead } from "./lib/api";
 import { Button } from "@/components/base/buttons/button";
 import { ChevronRight, RefreshCw01, Settings01 } from "@untitledui/icons";
+import logo from "@/assets/logo.png";
 
 function getPageFromHash(): string {
   const hash = window.location.hash.replace("#", "");
@@ -66,7 +67,7 @@ export default function App() {
 
   const pageTitle =
     currentPage === "leads"
-      ? "Meta Leads"
+      ? "BuildVick Leads"
       : currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
 
   let pageContent: React.ReactNode;
@@ -104,10 +105,10 @@ export default function App() {
   }
 
   return (
-    <div className="flex min-h-screen bg-primary text-primary antialiased">
+    <div className="flex h-screen overflow-hidden bg-primary text-primary antialiased">
       <Sidebar />
 
-      <main className="flex-1 min-w-0 bg-primary">
+      <main className="flex-1 min-w-0 overflow-y-auto bg-primary">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 border-b border-secondary bg-secondary/60 px-6 py-4 shadow-xs backdrop-blur-xl">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs text-tertiary">
@@ -205,7 +206,7 @@ export default function App() {
 
           <footer className="flex items-center justify-center gap-1.5 pt-2 pb-4 text-xs text-tertiary">
             <span>Powered by</span>
-            <img src="https://www.letsoutgrow.com/oglogo.png" alt="Outgrow" className="h-4 w-auto opacity-90" />
+            <img src={logo} alt="BuildVick" className="h-4 w-auto opacity-90" />
           </footer>
         </div>
       </main>

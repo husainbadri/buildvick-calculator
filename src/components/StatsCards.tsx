@@ -85,7 +85,7 @@ export default function StatsCards({ leads }: { leads: Lead[] }) {
                 {c.value}
               </div>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-utility-brand-50 text-utility-brand-600 ring-1 ring-inset ring-utility-brand-200">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-utility-brand-50 text-black ring-1 ring-inset ring-utility-brand-200">
               <c.icon className="size-5" />
             </div>
           </div>

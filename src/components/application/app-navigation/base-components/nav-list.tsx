@@ -15,7 +15,7 @@ export const NavList = ({ activeUrl, items, className }: NavListProps) => {
     const activeItem = items.find((item) => item.href === activeUrl || item.items?.some((subItem) => subItem.href === activeUrl));
 
     return (
-        <ul className={cx("flex flex-col px-4 pt-5", className)}>
+        <ul className={cx("flex flex-col px-4 pt-5 overflow-hidden", className)}>
             {items.map((item, index) => {
                 if (item.divider) {
                     return (

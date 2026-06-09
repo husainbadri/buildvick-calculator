@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download01, Plus, SearchLg } from "@untitledui/icons";
 import type { Lead } from "../lib/api";
 import { addLead, deleteLead, updateLead } from "../lib/api";
-import { Badge } from "@/components/base/badges/badges";
 import { Button } from "@/components/base/buttons/button";
 import { CheckboxBase } from "@/components/base/checkbox/checkbox";
 import { Input } from "@/components/base/input/input";
@@ -30,11 +29,11 @@ const SOURCE_PILL_CLASS =
   "inline-flex items-center rounded-md border border-secondary bg-secondary px-2.5 py-1 text-xs font-medium text-secondary";
 
 function getStatusClass(status: Lead["status"]) {
-  if (status === "New") return "text-utility-blue-700 ring-utility-blue-200 bg-utility-blue-50";
-  if (status === "Contacted") return "text-utility-yellow-700 ring-utility-yellow-200 bg-utility-yellow-50";
-  if (status === "Hot") return "text-utility-red-700 ring-utility-red-200 bg-utility-red-50";
-  if (status === "Won") return "text-utility-green-700 ring-utility-green-200 bg-utility-green-50";
-  return "text-fg-quaternary ring-border-secondary bg-primary";
+  if (status === "New") return "bg-utility-blue-50 text-utility-blue-700 border-utility-blue-200";
+  if (status === "Contacted") return "bg-utility-yellow-50 text-utility-yellow-700 border-utility-yellow-200";
+  if (status === "Hot") return "bg-utility-red-50 text-utility-red-700 border-utility-red-200";
+  if (status === "Won") return "bg-utility-green-50 text-utility-green-700 border-utility-green-200";
+  return "bg-utility-neutral-50 text-utility-neutral-700 border-utility-neutral-200";
 }
 
 function formatDate(iso: string) {
@@ -179,6 +178,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
         l.phone?.toLowerCase().includes(q) ||
         l.source?.toLowerCase().includes(q) ||
         l.notes?.toLowerCase().includes(q) ||
+        l.city?.toLowerCase().includes(q) ||
         l.location?.toLowerCase().includes(q) ||
         l.sales_person?.toLowerCase().includes(q) ||
         l.remark_1?.toLowerCase().includes(q) ||
@@ -311,7 +311,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
       "Phone",
       "Source",
       "Lead Status",
-      "Region",
+      "City",
       "Notes",
       "Next Follow-Up",
       "Final Follow-Up",
@@ -327,7 +327,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
         l.phone,
         l.source,
         l.status,
-        l.location,
+        l.city,
         l.notes,
         l.follow_up || "",
         l.follow_up_2 || "",
@@ -401,7 +401,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
         <TableCard.Header
           title="All leads"
           badge={filtered.length}
-          description="A clean operating view for Meta leads. Edit outcomes, follow-ups, ownership, and notes inline."
+          description="A clean operating view for BuildVick leads. Edit outcomes, follow-ups, ownership, and notes inline."
           contentTrailing={
             <div className="flex flex-wrap items-center gap-2">
               <Input
@@ -427,7 +427,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
                   <SelectItem key={s} id={s} label={s} />
                 ))}
               </Select>
-              <Button size="sm" color="secondary" iconLeading={Download01} onClick={exportCsv}>
+              <Button size="sm" color="secondary" iconLeading={Download01} onClick={() => exportCsv()}>
                 Export
               </Button>
               <Button size="sm" color="primary" iconLeading={Plus} onClick={() => setShowAddForm(!showAddForm)}>
@@ -565,7 +565,7 @@ export default function LeadsTable({ leads, onChange, loading }: Props) {
                 <Table.Head className="min-w-[140px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Phone</Table.Head>
                 <Table.Head className="min-w-[150px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Source</Table.Head>
                 <Table.Head className="min-w-[160px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Lead Status</Table.Head>
-                <Table.Head className="min-w-[180px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Region</Table.Head>
+                <Table.Head className="min-w-[180px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">City</Table.Head>
                 <Table.Head className="min-w-[240px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Notes</Table.Head>
                 <Table.Head className="min-w-[170px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Next Follow-Up</Table.Head>
                 <Table.Head className="min-w-[170px] text-xs font-semibold uppercase tracking-[0.08em] text-tertiary">Final Follow-Up</Table.Head>
@@ -646,6 +646,7 @@ function LeadRow({
 }) {
   const [draft, setDraft] = useState({
     notes: lead.notes,
+    city: lead.city,
     location: lead.location,
     sales_person: lead.sales_person,
     remark_1: lead.remark_1,
@@ -656,6 +657,7 @@ function LeadRow({
   useEffect(() => {
     const nextDraft = {
       notes: lead.notes,
+      city: lead.city,
       location: lead.location,
       sales_person: lead.sales_person,
       remark_1: lead.remark_1,
@@ -663,7 +665,7 @@ function LeadRow({
     };
     setDraft(nextDraft);
     initialDraft.current = nextDraft;
-  }, [lead.location, lead.notes, lead.remark_1, lead.remark_2, lead.sales_person]);
+  }, [lead.city, lead.location, lead.notes, lead.remark_1, lead.remark_2, lead.sales_person]);
 
   function handleFieldBlur(
     field: "notes" | "location" | "sales_person" | "remark_1" | "remark_2",
@@ -710,7 +712,7 @@ function LeadRow({
           value={lead.status || "New"}
           onChange={(e) => onStatusChange(lead.id, e.target.value)}
           className={cx(
-            "w-full cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium shadow-xs outline-none transition-all focus:ring-4 focus:ring-brand/12",
+            "w-full cursor-pointer rounded-lg border px-3 py-2 text-sm font-semibold shadow-xs outline-none transition-all focus:ring-4 focus:ring-brand/12 appearance-none",
             getStatusClass(lead.status),
           )}
         >
@@ -720,19 +722,7 @@ function LeadRow({
         </select>
       </Table.Cell>
       <Table.Cell className="align-top">
-        <div className="relative">
-          <input
-            type="text"
-            value={draft.location}
-            onChange={(e) => setDraft((current) => ({ ...current, location: e.target.value }))}
-            onBlur={() => handleFieldBlur("location", "Region saved.")}
-            placeholder="Add region"
-            className={CELL_INPUT_CLASS}
-          />
-          {saving === "location" && (
-            <span className="absolute -top-1 right-1 text-[10px] text-brand">saving...</span>
-          )}
-        </div>
+        <div className="text-sm text-secondary">{lead.city || "\u2014"}</div>
       </Table.Cell>
       <Table.Cell className="align-top">
         <div className="relative">

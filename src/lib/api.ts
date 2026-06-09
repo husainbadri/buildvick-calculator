@@ -7,6 +7,7 @@ export type Lead = {
   phone: string;
   source: string;
   notes: string;
+  city: string;
   location: string;
   sales_person: string;
   remark_1: string;
@@ -93,6 +94,7 @@ function toDatabaseLeadUpdate(updates: Partial<Lead>) {
     id: _id,
     created_at: _createdAt,
     updated_at: _updatedAt,
+    city,
     location,
     sales_person,
     remark_1,
@@ -102,6 +104,9 @@ function toDatabaseLeadUpdate(updates: Partial<Lead>) {
   } = updates;
 
   const payload: Record<string, unknown> = { ...rest };
+  if (city !== undefined) {
+    payload.city = city;
+  }
   const hasNotesPayload =
     location !== undefined ||
     sales_person !== undefined ||
@@ -144,6 +149,7 @@ function toLead(row: Record<string, unknown>): Lead {
     phone: String(row.phone ?? "N/A"),
     source: String(row.source ?? "Landing Page"),
     notes: leadNotes.feedback,
+    city: String(row.city ?? ""),
     location: leadNotes.location,
     sales_person: leadNotes.sales_person,
     remark_1: leadNotes.remark_1,
@@ -186,6 +192,7 @@ export async function fetchLeads(): Promise<Lead[]> {
             phone: r.phone,
             source: r.source,
             notes: r.notes,
+            city: r.city,
             status: r.status,
             follow_up: null,
             follow_up_2: null,
